@@ -25,20 +25,47 @@ public class HadoopTest {
     }
 
 
+    @Test
+
+    public void TestGetPathFromHdfs(){
+        System.out.println(getPathFromHdfs(HADOOP_PATH,"hdfs://hadoop0:8020/a.txt is file"));
+    }
+
+
+    public String getPathFromHdfs(String uriPath,String hdfsPath){
+
+        int uriLength = uriPath.length();
+
+        String path = hdfsPath.substring(uriLength);
+
+        return path;
+    }
+
     /***
-     * 列出目录下的文件信息
+     * 递归列出目录下的文件信息
      * @throws Exception
      */
 
+
     @Test
-    public void listDir() throws Exception {
+    public void testListDir() throws Exception {
+        listDir("/");
+    }
+
+
+    public void listDir(String path) throws Exception {
 
         //FileStatus fileStatus = fs.getFileStatus(new Path("/"));
-        FileStatus[] fileStatuses = fs.listStatus(new Path("/"));
+        FileStatus[] fileStatuses = fs.listStatus(new Path(path));
 
-        for (FileStatus fileStatuse:fileStatuses
-             ) {
-            System.out.println(fileStatuse.getPath().toString());
+        for (FileStatus fileStatuse : fileStatuses) {
+            if (fileStatuse.isDirectory()) {
+                System.out.println(fileStatuse.getPath().toString()+"--dir");
+                listDir(getPathFromHdfs(HADOOP_PATH, fileStatuse.getPath().toString()));
+            }
+            else {
+                System.out.println(fileStatuse.getPath().toString() + "--file");
+            }
         }
     }
 
